@@ -109,11 +109,8 @@ def force_int(input):
                 int(input)
             except ValueError:
                 return tkdefault
-                continue
             else:
                 return int(input)
-                break
-
 
 def tkpopup_choice(window_title, window_message):
     user_bool = messagebox.askokcancel(window_title, window_message)
@@ -165,21 +162,27 @@ def select_operating_files():
         tkupdate_text(t_directory.object,warning_empty_directory)
 
 def build_name_integer():
+    ls_new_file_name.clear()
+    ls_new_file_path.clear()
     if not set_directory_string.get() == tkdefault:
         if not set_existing_name_string.get() == tkdefault:
             file_list_size = range(0, len(ls_selected_file_name))
-            if not force_int(input_changer.get()) == tkdefault and not force_int(input_integer.get()) == tkdefault:
+            if not force_int(input_changer.get()) == tkdefault and not force_int(input_integer.get()) == tkdefault and int(input_changer.get()) > 0:
                 ls_int_component.clear()
                 if force_int(input_integer.get()) == 0 and len(str(input_integer.get())) == 0:
                     for i in file_list_size:
                         changer_output = str(int(input_changer.get()) * i)
                         ls_int_component.append(changer_output)
+                    return True
                 else:
                     for i in file_list_size:
-                        prefix_zero = "0" * (len(str(input_integer.get()))-len(str(int(input_integer.get()))))
                         temp_int = int(input_integer.get()) + int(input_changer.get()) * i
+                        int_addition_digit = len(str(temp_int))
+                        int_str_digit = len(str(input_integer.get()))
+                        prefix_zero = "0" * (int_str_digit - int_addition_digit)
                         changer_output = prefix_zero + str(temp_int)
                         ls_int_component.append(changer_output)
+                    return True
             else:
                 tkupdate_text(t_new_names.object,warning_integer_input)
         else:
@@ -188,11 +191,8 @@ def build_name_integer():
         tkupdate_text(t_directory.object,warning_empty_directory)
 
 def build_name_compose():
-    build_name_integer()
-    if True:
+    if build_name_integer() == True:
         file_list_size = range(0, len(ls_int_component))
-        ls_new_file_name.clear()
-        ls_new_file_path.clear()
         for i in file_list_size:
             composed_new_name = input_prefix.get() + str(ls_int_component[i]) + input_suffix.get() + "." + input_extension.get()
             ls_new_file_name.append(composed_new_name)
@@ -214,6 +214,8 @@ def renaming_operation():
                         temp_copied_file_path = set_directory_string.get() + "/" + ls_selected_file_name [i]
                         os.rename(temp_copied_file_path, ls_new_file_path [i])
                         tkupdate_text(t_directory.object, message_finished)
+                        os.startfile(set_directory_string.get())
+
                 else:
                     pass
             else:
@@ -307,8 +309,8 @@ b_select_directory = button(frame_button.object,"#F8B195" ,"Location",select_cre
 b_select_files = button(frame_button.object,"#F67280" ,"Files",select_operating_files,"normal", 1,0,1,1)
 b_preview = button(frame_button.object,"#C06C84" ,"Preview",build_name_compose,"normal", 2,0,1,1)
 b_rename = button(frame_button.object,"#6C5B7B" ,"Rename",renaming_operation,"normal", 3,0,1,1)
-b_cancel = button(frame_button.object,"#355C7D","Quit",quit_cancel,"normal", 4,0,1,1)
-b_help = button(frame_empty.object,"#2F9599","Help!",help_hit,"normal", 0,0,1,1)
+b_cancel = button(frame_button.object,"#355C7D","Cancel",quit_cancel,"normal", 4,0,1,1)
+b_help = button(frame_empty.object,"#2F9599","HELP!",help_hit,"normal", 0,0,1,1)
 
 
 # --- TKINTER TEXT BOXES
@@ -335,7 +337,6 @@ ext_label.grid(row = 0, column = 5,rowspan = 1, columnspan = 1, sticky = "ew")
 intro_label.pack()
 
 # --- TKINTER MAINLOOP
-root.iconbitmap(r"C:\Users\zach\Dropbox\Snake 3\R_Naming\R_Naming.ico")
 frame_intro.object.grid_forget()
 root.geometry("900x335")
 root.mainloop()
